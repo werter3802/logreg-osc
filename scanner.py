@@ -9,7 +9,7 @@ SYMBOLS = {"EURUSD": "EURUSD=X", "GBPUSD": "GBPUSD=X", "USDJPY": "USDJPY=X",
 TIMEFRAMES = {"5m": "7d", "15m": "20d"}   # interwał: ile historii pobrać
 LR_LEN, LR_LAG = 100, 3      # ustaw jak we wskaźniku LogReg
 AO_LEN, AO_SIG = 50, 9       # ustaw jak w Andean Oscillator
-MAX_WAIT_BARS = 30           # Andean ma się zgrać w ciągu tylu świec od zmiany koloru (None = bez limitu)
+MAX_WAIT_BARS = {"5m": 12, "15m": 8}   # ile świec po zmianie koloru Andean ma czas się zgrać (None = bez limitu)
 MAX_ALERT_AGE = 6            # alert tylko, jeśli zgranie było w ostatnich N zamkniętych świecach
 STATE_FILE = "state.json"
 
@@ -43,7 +43,7 @@ def get_df(ticker, tf):
     df = yf.Ticker(ticker).history(period=TIMEFRAMES[tf], interval=tf)
     return df if len(df) >= LR_LEN + 200 else None
 
-def check(df):
+def check(df, tf):
     df = df.iloc[:-1]                                    # odrzuć niezamkniętą świecę
     o, c = df["Open"].to_numpy(float), df["Close"].to_numpy(float)
     n = len(c)
@@ -67,7 +67,8 @@ def check(df):
     # pierwsze zgranie Andean po zmianie koloru (kolor logreg nadal ten sam)
     bull, sig, bear = andean(o, c, AO_LEN, AO_SIG)
     aligned = (bull > sig) & (sig > bear) if direction == 1 else (bear > sig) & (sig > bull)
-    end = n if MAX_WAIT_BARS is None else min(n, f + MAX_WAIT_BARS + 1)
+    wait = MAX_WAIT_BARS[tf]
+    end = n if wait is None else min(n, f + wait + 1)
     hits = np.where(aligned[f:end])[0]
     if len(hits) == 0:
         return None
@@ -88,7 +89,7 @@ def main():
                 df = get_df(ticker, tf)
                 if df is None:
                     print(name, tf, "brak danych"); continue
-                res = check(df)
+                res = check(df, tf)
             except Exception as e:
                 print(name, tf, "błąd:", e); continue
             if not res:
