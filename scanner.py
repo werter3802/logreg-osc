@@ -10,7 +10,7 @@ TIMEFRAMES = {"5m": "7d", "15m": "20d"}   # interwał: ile historii pobrać
 LR_LEN, LR_LAG = 100, 3      # ustaw jak we wskaźniku LogReg
 AO_LEN, AO_SIG = 50, 9       # ustaw jak w Andean Oscillator
 MAX_WAIT_BARS = 30           # Andean ma się zgrać w ciągu tylu świec od zmiany koloru (None = bez limitu)
-MAX_ALERT_AGE = 4            # alert tylko, jeśli zgranie było w ostatnich N zamkniętych świecach
+MAX_ALERT_AGE = 6            # alert tylko, jeśli zgranie było w ostatnich N zamkniętych świecach
 STATE_FILE = "state.json"
 
 def log_reg_line(close, n):
