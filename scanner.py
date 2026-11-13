@@ -5,6 +5,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 TOKEN, CHAT_ID = os.environ["TG_TOKEN"], os.environ["TG_CHAT_ID"]
 
 SYMBOLS = {"EURUSD": "EURUSD=X", "GBPUSD": "GBPUSD=X", "USDJPY": "USDJPY=X",
+           "USDCAD": "USDCAD=X", "GBPJPY": "GBPJPY=X",
            "XAUUSD": "GC=F", "US100": "NQ=F", "US500": "ES=F", "BTCUSD": "BTC-USD"}
 TIMEFRAMES = {"5m": "7d", "15m": "20d"}   # interwał: ile historii pobrać
 LR_LEN, LR_LAG = 100, 3      # ustaw jak we wskaźniku LogReg
