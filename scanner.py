@@ -94,6 +94,7 @@ def main():
                 if df is None:
                     print(name, tf, "brak danych"); continue
                 res = check(df, tf)
+                       print(name, tf, "->", res)
             except Exception as e:
                 print(name, tf, "błąd:", e); continue
             if not res:
