@@ -1,4 +1,4 @@
-import json, os
+import json, os, time
 import numpy as np, pandas as pd, requests, yfinance as yf
 from numpy.lib.stride_tricks import sliding_window_view
 
@@ -82,8 +82,17 @@ def pl(t):
     return t.tz_convert("Europe/Warsaw").strftime("%d.%m %H:%M")
            
 def send(text):
-    requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
-                  data={"chat_id": CHAT_ID, "text": text}, timeout=15)
+    for _ in range(3):                      # do 3 prób
+        try:
+            r = requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+                              data={"chat_id": CHAT_ID, "text": text}, timeout=15)
+            if r.ok:
+                return True
+            print("Telegram błąd:", r.status_code)
+        except requests.RequestException as e:
+            print("Telegram wyjątek:", type(e).__name__)
+        time.sleep(3)
+    return False
 
 def main():
     state = json.load(open(STATE_FILE)) if os.path.exists(STATE_FILE) else {}
