@@ -94,7 +94,7 @@ def main():
                 if df is None:
                     print(name, tf, "brak danych"); continue
                 res = check(df, tf)
-                       print(name, tf, "->", res)
+                print(name, tf, "->", res)
             except Exception as e:
                 print(name, tf, "błąd:", e); continue
             if not res:
@@ -102,11 +102,13 @@ def main():
             side, t_flip, t_hit = res
             key = f"{name}-{tf}"
             if state.get(key) != str(t_flip):            # jeden alert na jedną zmianę koloru
-                       ok = send(f"{name} {tf}: {side}\n"
-                                 f"LogReg zmienił kolor: {pl(t_flip)}\n"
-                                 f"Andean zgrany: {pl(t_hit)}\n"
-                                 f"(czas polski, godziny to otwarcie świecy)")
-                       state[key] = str(t_flip)
+                ok = send(f"{name} {tf}: {side}\n"
+                          f"LogReg zmienił kolor: {pl(t_flip)}\n"
+                          f"Andean zgrany: {pl(t_hit)}\n"
+                          f"(czas polski, godziny to otwarcie świecy)")
+                if ok:                                   # oznacz jako wysłany tylko po udanym wysłaniu
+                    state[key] = str(t_flip)
+                    json.dump(state, open(STATE_FILE, "w"))
     json.dump(state, open(STATE_FILE, "w"))
 
 if __name__ == "__main__":
