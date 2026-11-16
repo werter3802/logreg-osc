@@ -78,6 +78,9 @@ def check(df, tf):
         return None
     return ("LONG 🟢" if direction == 1 else "SHORT 🔴"), df.index[f], df.index[j]
 
+def pl(t):
+    return t.tz_convert("Europe/Warsaw").strftime("%d.%m %H:%M")
+           
 def send(text):
     requests.post(f"https://api.telegram.org/bot{TOKEN}/sendMessage",
                   data={"chat_id": CHAT_ID, "text": text}, timeout=15)
@@ -98,9 +101,11 @@ def main():
             side, t_flip, t_hit = res
             key = f"{name}-{tf}"
             if state.get(key) != str(t_flip):            # jeden alert na jedną zmianę koloru
-                send(f"{name} {tf}: {side}\nLogReg zmienił kolor: {t_flip}\n"
-                     f"Andean zgrany: {t_hit}\nKolor logreg nadal ten sam")
-                state[key] = str(t_flip)
+                       ok = send(f"{name} {tf}: {side}\n"
+                                 f"LogReg zmienił kolor: {pl(t_flip)}\n"
+                                 f"Andean zgrany: {pl(t_hit)}\n"
+                                 f"(czas polski, godziny to otwarcie świecy)")
+                       state[key] = str(t_flip)
     json.dump(state, open(STATE_FILE, "w"))
 
 if __name__ == "__main__":
